@@ -12,7 +12,8 @@ var gameSchema = new mongoose.Schema({
         7: String,
         8: String,
     },
-    turn: String
+    turn: String,
+    yPresent: Boolean,
 })
 
 module.exports = new mongoose.model('games', gameSchema)
