@@ -19,7 +19,8 @@ public class Game {
         while (running) {
             var client = HttpClient.newHttpClient();
             var request = HttpRequest.newBuilder(URI.create(url))
-                    .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\", \"host\": \"X\"}", gameCode)))
+                    .POST(HttpRequest.BodyPublishers
+                            .ofString(String.format("{\"game\": \"%s\", \"host\": \"X\"}", gameCode)))
                     .header("Content-type", "application/json").build();
             try {
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -30,17 +31,19 @@ public class Game {
                 } else {
                     TimeUnit.MILLISECONDS.sleep(500);
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
     }
 
     public static void myTurn(char player, String gameCode, Consumer<Boolean> callback) {
         boolean running = true;
-        
+
         while (running) {
             var client = HttpClient.newHttpClient();
             var request = HttpRequest.newBuilder(URI.create(url))
-                    .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\", \"host\": \"X\"}", gameCode)))
+                    .POST(HttpRequest.BodyPublishers
+                            .ofString(String.format("{\"game\": \"%s\", \"host\": \"X\"}", gameCode)))
                     .header("Content-type", "application/json").build();
             try {
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -52,18 +55,20 @@ public class Game {
                     callback.accept(true);
                     running = false;
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
     }
 
     public static void makeMove(String gameCode, int move, char player, char[] board) {
-        
+
         var client = HttpClient.newHttpClient();
-        
+
         var request = HttpRequest.newBuilder(URI.create(url))
-            .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\", \"move\": {\"position\": \"%d\", \"turn\": \"%c\"}}", gameCode, move, player)))
-            .header("Content-type", "application/json").build();
-        System.out.println("make Move 3");
+                .POST(HttpRequest.BodyPublishers.ofString(
+                        String.format("{\"game\": \"%s\", \"move\": {\"position\": \"%d\", \"turn\": \"%c\"}}",
+                                gameCode, move, player)))
+                .header("Content-type", "application/json").build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
@@ -74,6 +79,39 @@ public class Game {
         } catch (Exception e) {
             System.out.println("was error");
         }
+    }
+
+    public static void updateBoard(String gameCode, char[] board, Consumer<Boolean> callback) {
+        var client = HttpClient.newHttpClient();
+        var request = HttpRequest.newBuilder(URI.create(url))
+                .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\"}", gameCode)))
+                .header("Content-type", "application/json").build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
+            for (int i = 0; i < board.length; i++) {
+                board[i] = jsonResponse.get("positions").getAsJsonObject().get(Integer.toString(i)).toString()
+                        .charAt(1);
+            }
+        } catch (Exception e) {}
+        callback.accept(true);
+    }
+
+    public static void updateBoard(String gameCode, char[] board) {
+        var client = HttpClient.newHttpClient();
+        var request = HttpRequest.newBuilder(URI.create(url))
+                .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\"}", gameCode)))
+                .header("Content-type", "application/json").build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
+            for (int i = 0; i < board.length; i++) {
+                board[i] = jsonResponse.get("positions").getAsJsonObject().get(Integer.toString(i)).toString()
+                        .charAt(1);
+            }
+        } catch (Exception e) {}
     }
 
 }

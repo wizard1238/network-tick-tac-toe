@@ -21,7 +21,16 @@ public class TickTackToe {
     }
 
     public static boolean winnerExists(char[] board) {
-        int[][] winCombos = { { 0, 1, 2 }, { 3, 4, 5 }, { 6, 7, 8 }, { 0, 3, 6 }, { 1, 4, 7 }, { 2, 5, 8 }, };
+        int[][] winCombos = {
+            { 0, 1, 2 },
+            { 3, 4, 5 },
+            { 6, 7, 8 },
+            { 0, 3, 6 },
+            { 1, 4, 7 },
+            { 2, 5, 8 },
+            { 0, 4, 8 },
+            { 0, 4, 6 },
+        };
 
         for (int[] i : winCombos) {
             if ((board[i[0]] == board[i[1]]) && (board[i[1]] == board[i[2]])) {
@@ -33,7 +42,7 @@ public class TickTackToe {
 
     public static boolean isBoardFull(char[] board) {
         for (char i : board) {
-            if ((i != 'X') && (i != 'Y')) {
+            if ((i != 'X') && (i != 'O')) {
                 return false;
             }
         }
@@ -41,14 +50,11 @@ public class TickTackToe {
     }
 
     public static void doMove(char player, char[] board, String gameCode) {
-
         System.out.printf("Player %c. Please enter board position (0-8) for a %c: %n", player, player);
         Scanner s = new Scanner(System.in);
         int position = s.nextInt();
         board[position] = player;
         Game.makeMove(gameCode, position, player, board);
-        drawBoard(board);
-
     }
 
     public static String startNewGame() {
@@ -63,63 +69,9 @@ public class TickTackToe {
         }
     }
 
-    public static void updateBoard(String gameCode, char[] board) {
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(URI.create(url))
-                .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\"}", gameCode)))
-                .header("Content-type", "application/json").build();
-
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
-            for (int i = 0; i < board.length; i++) {
-                board[i] = jsonResponse.get("positions").getAsJsonObject().get(Integer.toString(i)).toString()
-                        .charAt(1);
-            }
-        } catch (Exception e) {}
-    }
-
-    public static void makeMove(String gameCode, int move, char player, char[] board) {
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(URI.create(url))
-            .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\", \"move\": {\"position\": \"%i\", \"turn\": \"%c\"}}", gameCode, move, player)))
-            .header("Content-type", "application/json").build();
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
-            for (int i = 0; i < board.length; i++) {
-                board[i] = jsonResponse.get("positions").getAsJsonObject().get(Integer.toString(i)).toString()
-                        .charAt(1);
-            }
-        } catch (Exception e) {
-            System.out.println("was error");
-        }
-    }
-    
-    public static boolean myTurn(char player, String gameCode) {
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(URI.create(url))
-                .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\", \"host\": \"X\"}", gameCode)))
-                .header("Content-type", "application/json").build();
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
-            System.out.println(jsonResponse.get("turn").toString());
-            if (jsonResponse.get("turn").toString().equals(String.format("\"%c\"", player))) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     public static void main(String[] args) {
 
         char[] board = { '0', '1', '2', '3', '4', '5', '6', '7', '8' };
-
-        
 
         Scanner s = new Scanner(System.in);
         System.out.println("Would you like to start a game, or join one? [s(start)/j(join)]");
@@ -139,39 +91,55 @@ public class TickTackToe {
         } else if (choice.equals("j")) {
             System.out.println("Please enter the game code");
             Game.gameCode = s.nextLine();
-            updateBoard(Game.gameCode, board);
+            Game.updateBoard(Game.gameCode, board);
             Game.player = 'O';
         }
 
         while (Game.playing) {
             Game.myTurn(Game.player, Game.gameCode, (turn) -> {
-                drawBoard(board);
-                if (Game.player == 'X') {
-                    doMove('X', board, Game.gameCode);
+                Game.updateBoard(Game.gameCode, board, (callback -> {
                     if (winnerExists(board)) {
-                        Game.winner = 'O';
+                        if (Game.player == 'X') {
+                            Game.winner = 'O';
+                        } else if (Game.player == 'O') {
+                            Game.winner = 'X';
+                        }
                         Game.playing = false;
                     } else if (isBoardFull(board)) {
                         Game.winner = 'T';
                         Game.playing = false;
+                    } else {
+                        drawBoard(board);
+                        if (Game.player == 'X') {
+                            doMove('X', board, Game.gameCode);
+                            if (winnerExists(board)) {
+                                Game.winner = 'X';
+                                Game.playing = false;
+                            } else if (isBoardFull(board)) {
+                                Game.winner = 'T';
+                                Game.playing = false;
+                            }
+                            drawBoard(board);
+                        } else {
+                            doMove('O', board, Game.gameCode);
+                            if (winnerExists(board)) {
+                                Game.winner = 'O';
+                                Game.playing = false;
+                            } else if (isBoardFull(board)) {
+                                Game.winner = 'T';
+                                Game.playing = false;
+                            }
+                            drawBoard(board);
+                        }
                     }
-                } else {
-                    doMove('O', board, Game.gameCode);
-                    if (winnerExists(board)) {
-                        Game.winner = 'O';
-                        Game.playing = false;
-                    } else if (isBoardFull(board)) {
-                        Game.winner = 'T';
-                        Game.playing = false;
-                    }
-                }
+                }));
             });
         }
 
         if (Game.winner == 'T') {
             System.out.println("The game is tied. Game over");
         } else {
-            System.out.printf("The winner is %c. Congratulations", Game.winner);
+            System.out.printf("The winner is %c. Good Game", Game.winner);
         }
     }
 }

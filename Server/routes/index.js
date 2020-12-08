@@ -18,8 +18,6 @@ router.post('/game', function(req, res, next) {
   let move = req.body.move
   let host = req.body.host
 
-  console.log(req.body)
-
   if (gameId) {
     if (move) {
       gameModel.findById(gameId, function(err, game) {
