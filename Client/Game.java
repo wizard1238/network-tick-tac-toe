@@ -14,9 +14,20 @@ public class Game {
     static char player = 'T';
     static String gameCode = "none";
 
-    public static void checkJoined(String gameCode, Consumer<Boolean> callback) {
-        boolean running = true;
-        while (running) {
+    public static String startNewGame() {
+        var client = HttpClient.newHttpClient();
+        var request = HttpRequest.newBuilder(URI.create(url)).POST(HttpRequest.BodyPublishers.ofString(""))
+                .header("Content-type", "application/json").build();
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.body().substring(1, response.body().length() - 1);
+        } catch (Exception e) {
+            return "error";
+        }
+    }
+
+    public static void checkJoined(String gameCode) {
+        while (true) {
             var client = HttpClient.newHttpClient();
             var request = HttpRequest.newBuilder(URI.create(url))
                     .POST(HttpRequest.BodyPublishers
@@ -26,12 +37,12 @@ public class Game {
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
                 if (jsonResponse.get("yPresent").toString().equals("\"true\"")) {
-                    running = false;
-                    callback.accept(true);
+                    return;
                 } else {
                     TimeUnit.MILLISECONDS.sleep(500);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -56,14 +67,13 @@ public class Game {
                     running = false;
                 }
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
 
     public static void makeMove(String gameCode, int move, char player, char[] board) {
-
         var client = HttpClient.newHttpClient();
-
         var request = HttpRequest.newBuilder(URI.create(url))
                 .POST(HttpRequest.BodyPublishers.ofString(
                         String.format("{\"game\": \"%s\", \"move\": {\"position\": \"%d\", \"turn\": \"%c\"}}",
@@ -77,10 +87,12 @@ public class Game {
                         .charAt(1);
             }
         } catch (Exception e) {
-            System.out.println("was error");
+            e.printStackTrace();
         }
     }
 
+
+    //Update board methods
     public static void updateBoard(String gameCode, char[] board, Consumer<Boolean> callback) {
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(URI.create(url))
@@ -94,7 +106,9 @@ public class Game {
                 board[i] = jsonResponse.get("positions").getAsJsonObject().get(Integer.toString(i)).toString()
                         .charAt(1);
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         callback.accept(true);
     }
 
@@ -111,7 +125,9 @@ public class Game {
                 board[i] = jsonResponse.get("positions").getAsJsonObject().get(Integer.toString(i)).toString()
                         .charAt(1);
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

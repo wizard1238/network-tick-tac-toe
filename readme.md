@@ -1,4 +1,4 @@
-# Getting Started
+# Getting Started with Server
 
 First, create a .env file in the root directory of the repo with contents `MONGOOSEURL = "<mongoose connection string>"`
 Then, run `yarn`, then `yarn dev`.
@@ -27,3 +27,6 @@ Making a move:
     }
 }
 ```
+
+# Getting Started with Client
+

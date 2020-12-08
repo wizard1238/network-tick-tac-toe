@@ -1,12 +1,4 @@
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class TickTackToe {
     static String url = "http://localhost:3000/game";
@@ -57,37 +49,18 @@ public class TickTackToe {
         Game.makeMove(gameCode, position, player, board);
     }
 
-    public static String startNewGame() {
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(URI.create(url)).POST(HttpRequest.BodyPublishers.ofString(""))
-                .header("Content-type", "application/json").build();
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body().substring(1, response.body().length() - 1);
-        } catch (Exception e) {
-            return "error";
-        }
-    }
-
     public static void main(String[] args) {
-
         char[] board = { '0', '1', '2', '3', '4', '5', '6', '7', '8' };
 
         Scanner s = new Scanner(System.in);
         System.out.println("Would you like to start a game, or join one? [s(start)/j(join)]");
         String choice = s.nextLine();
         if (choice.equals("s")) {
-            Game.gameCode = startNewGame();
+            Game.gameCode = Game.startNewGame();
             Game.player = 'X';
             System.out.printf("The game code is: %s", Game.gameCode);
             System.out.println("\nWaiting for other player to join");
-            try {
-                TimeUnit.MILLISECONDS.sleep(500);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-            Game.checkJoined(Game.gameCode, (joined) -> {});
-            
+            Game.checkJoined(Game.gameCode);
         } else if (choice.equals("j")) {
             System.out.println("Please enter the game code");
             Game.gameCode = s.nextLine();
