@@ -7,10 +7,16 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+router.post('/gameCheck', function(req, res, next) {
+  console.log('bye')
+  console.log(req.body)
+  res.send("5fcec736d318730af4653bae")
+})
+
 router.post('/game', function(req, res, next) {
   let gameId = req.body.game
   let move = req.body.move
-
+  let host = req.body.host
 
   console.log(req.body)
 
@@ -30,10 +36,16 @@ router.post('/game', function(req, res, next) {
       })
     } else {
       gameModel.findById(gameId, function(err, game) {
-        game.yPresent = true
-        game.save(function(err, savedGame) {
+        if (!game) {
+          res.status(400).send('No game with that id')
+        } else if (host == "X") {
           res.send(game)
-        })
+        } else {
+          game.yPresent = "true"
+          game.save(function(err, savedGame) {
+            res.send(savedGame)
+          })
+        }
       })
     }
   } else {
@@ -49,7 +61,8 @@ router.post('/game', function(req, res, next) {
         7: "7",
         8: "8",
       },
-      turn: "X"
+      turn: "O",
+      yPresent: "false",
     })
     game.save(function(err, savedGame) {
       res.send(savedGame._id)
