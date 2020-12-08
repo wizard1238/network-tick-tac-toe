@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.post('/gameCheck', function(req, res, next) {
+router.post('/gameCheck', function(req, res, next) { //For testing
   console.log('bye')
   console.log(req.body)
   res.send("5fcec736d318730af4653bae")

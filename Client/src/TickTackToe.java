@@ -46,9 +46,7 @@ public class TickTackToe {
         Scanner s = new Scanner(System.in);
         int position = s.nextInt();
         board[position] = player;
-        System.out.println("before make move");
         Game.makeMove(gameCode, position, player, board);
-        System.out.println("went to make move?");
         drawBoard(board);
 
     }
@@ -86,7 +84,6 @@ public class TickTackToe {
         var request = HttpRequest.newBuilder(URI.create(url))
             .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\", \"move\": {\"position\": \"%i\", \"turn\": \"%c\"}}", gameCode, move, player)))
             .header("Content-type", "application/json").build();
-        System.out.println("in make move");
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
@@ -150,9 +147,7 @@ public class TickTackToe {
             Game.myTurn(Game.player, Game.gameCode, (turn) -> {
                 drawBoard(board);
                 if (Game.player == 'X') {
-                    System.out.println("less wow");
                     doMove('X', board, Game.gameCode);
-                    System.out.println("slightly more wow");
                     if (winnerExists(board)) {
                         Game.winner = 'O';
                         Game.playing = false;
@@ -160,7 +155,6 @@ public class TickTackToe {
                         Game.winner = 'T';
                         Game.playing = false;
                     }
-                    System.out.println("wow");
                 } else {
                     doMove('O', board, Game.gameCode);
                     if (winnerExists(board)) {
