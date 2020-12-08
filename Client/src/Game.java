@@ -61,7 +61,7 @@ public class Game {
         var client = HttpClient.newHttpClient();
         
         var request = HttpRequest.newBuilder(URI.create(url))
-            .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\", \"move\": {\"position\": \"%i\", \"turn\": \"%c\"}}", gameCode, move, player)))
+            .POST(HttpRequest.BodyPublishers.ofString(String.format("{\"game\": \"%s\", \"move\": {\"position\": \"%d\", \"turn\": \"%c\"}}", gameCode, move, player)))
             .header("Content-type", "application/json").build();
         System.out.println("make Move 3");
         try {

@@ -21,7 +21,6 @@ public class TickTackToe {
     }
 
     public static boolean winnerExists(char[] board) {
-
         int[][] winCombos = { { 0, 1, 2 }, { 3, 4, 5 }, { 6, 7, 8 }, { 0, 3, 6 }, { 1, 4, 7 }, { 2, 5, 8 }, };
 
         for (int[] i : winCombos) {
@@ -29,7 +28,6 @@ public class TickTackToe {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -39,7 +37,6 @@ public class TickTackToe {
                 return false;
             }
         }
-
         return true;
     }
 
