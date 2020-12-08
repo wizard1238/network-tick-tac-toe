@@ -30,3 +30,17 @@ Making a move:
 
 # Getting Started with Client
 
+Put `Game.java` into the same directory as your code. Add [gson](https://github.com/google/gson) to the java project. Change the static String `url` to the url of the server. Methods are listed here
+
+- `startNewGame`: Returns a string with the game code.
+- `checkJoined`: Returns void when another client has joined the same game. Takes string `gameCode` as a parameter.
+- `myTurn`: Runs callback when it is that client's turn. Takes char `player`, string `gameCode`, and a callback that returns a boolean `true`
+    ```java
+    Game.myTurn('X', "<gameCode>", (callback) -> {
+        //Run code here
+    })
+    ```
+- `makeMove`: Posts move to server. Takes string `gameCode`, int `move`, char `player`, char[] `board`. Returns void.
+- `updateBoard`: Gets board info from server. Takes string `gameCode`, char[] `board`, with an optional callback.
+
+Example code is in the `/example` folder.
