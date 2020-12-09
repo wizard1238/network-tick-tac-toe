@@ -1,8 +1,6 @@
 import java.util.Scanner;
 
 public class TickTackToe {
-    static String url = "http://localhost:3000/game";
-
     public static void drawBoard(char[] board) {
         System.out.println();
         System.out.println("  " + board[0] + "|" + board[1] + "|" + board[2]);
