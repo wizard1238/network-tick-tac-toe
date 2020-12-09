@@ -30,7 +30,7 @@ Making a move:
 
 # Getting Started with Client
 
-Put `Game.java` into the same directory as your code. Add [gson](https://github.com/google/gson) to the java project. Change the static String `url` to the url of the server. Methods are listed here
+Put `Game.java` into the same directory as your code. Add [gson](https://github.com/google/gson) to the java project. Change the static String `url` in `Game.java` to the url of the server. Methods are listed here
 
 - `startNewGame`: Returns a string with the game code.
 - `checkJoined`: Returns void when another client has joined the same game. Takes string `gameCode` as a parameter.
